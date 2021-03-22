@@ -61,9 +61,10 @@ function buildCharts(sample) {
     console.log(data);
 
     // Create a variable that holds the samples array. 
-    var buttonSamples = data.samples;
+    var samples = data.samples;
+    console.log(samples);
     // Create a variable that filters the samples for the object with the desired sample number.
-    var filterObject = buttonSamples.filter(sampleObj => sampleObj.id == sample);
+    var filterObject = samples.filter(sampleObj => sampleObj.id == sample);
     // 1. Create a variable that filters the metadata array for the object with the desired sample number.
     var metaArray = data.metadata.filter(sampleObj => sampleObj.id == sample);
     // Create a variable that holds the first sample in the array.
@@ -73,9 +74,9 @@ function buildCharts(sample) {
     var meta = metaArray[0];
 
     // Create variables that hold the otu_ids, otu_labels, and sample_values.
-    var otuIds = result.otu_ids;
-    var otuLabels = result.otu_labels;
-    var sampleValues = result.sample_values;
+    var otu_ids = filterObject[0].otu_ids;
+    var otu_labels = filterObject[0].otu_labels;
+    var sample_values = filterObject[0].sample_values;
 
     // 3. Create a variable that holds the washing frequency.
     var wfreq = meta.wfreq;
@@ -83,35 +84,36 @@ function buildCharts(sample) {
     // Create the yticks for the bar chart.
     // Hint: Get the the top 10 otu_ids and map them in descending order 
     // so the otu_ids with the most bacteria are last. 
-    var yticks = otuIds.slice(0,10).map(otu => "OTU" + otu).reverse();
-    var xticks = sampleValues.slice(0,10).reverse()
+    var yticks = otu_ids.slice(0,10).map(otuID => `OTU ${otuID}`).reverse();
 
     // Create the trace for the bar chart. 
-    var barData = [{
-      x: xticks,
-      y: yticks,
-      type: "bar",
-      orientation: 'h',
-      text: otuLabels.slice(0,10).reverse()
+    var barData = [
+      {
+        x: sample_values.slice(0, 10).reverse(),
+        y: yticks,
+        text: otu_labels.slice(0, 10).reverse(),
+        type: "bar",
+        orientation: 'h',
+      }
+    ];
 
-    }];
     // Create the layout for the bar chart. 
     var barLayout = {
       title: "Top 10 Bacteria Cultures Found"
     };
 
     // Use Plotly to plot the data with the layout. 
-    Plotly.newPlot("bar", barData, barLayout);
+    Plotly.newPlot("bar", barData, barLayout, {responsive:true});
     // Create the trace for the bubble chart.
     var bubbleData = [{
       type: 'bubble',
-      x: otuIds,
-      y: sampleValues,
-      text: otuLabels,
+      x: otu_ids,
+      y: sample_values,
+      text: otu_labels,
       mode: 'markers',
       marker: {
-        size : sampleValues,
-        color: otuIds
+        size : sample_values,
+        color: otu_ids
       }
     }
    
@@ -124,7 +126,7 @@ function buildCharts(sample) {
     };
 
     // D2: 3. Use Plotly to plot the data with the layout.
-    Plotly.newPlot("bubble", bubbleData, bubbleLayout);
+    Plotly.newPlot("bubble", bubbleData, bubbleLayout, {responsive:true});
     
     // 4. Create the trace for the gauge chart.
     var gaugeData = [{
@@ -154,6 +156,6 @@ function buildCharts(sample) {
     };
 
     // 6. Use Plotly to plot the gauge data and layout.
-    Plotly.newPlot("gauge", gaugeData, gaugeLayout);
+    Plotly.newPlot("gauge", gaugeData, gaugeLayout, {responsive:true});
   });
 }
